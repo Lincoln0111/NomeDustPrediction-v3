@@ -1,0 +1,48 @@
+{
+  "trained_at": "2026-02-10T15:16:29.301837+00:00",
+  "data_file": "Nome-Hourly-Data.csv",
+  "train_samples": 10392,
+  "val_samples": 2599,
+  "feature_count": 81,
+  "classifier_metrics": {
+    "train_samples": 10392,
+    "train_positive": 3107,
+    "train_auc": 0.9802088361149652,
+    "train_brier": 0.09543780601708433,
+    "train_precision": 0.9017282277194172,
+    "train_recall": 0.8564531702607017,
+    "val_samples": 2599,
+    "val_positive": 868,
+    "val_auc": 0.9585449794610077,
+    "val_brier": 0.12863502066892357,
+    "val_precision": 0.8016877637130801,
+    "val_recall": 0.8755760368663594,
+    "top_features": {
+      "pm10_lag_1h": 0.6531,
+      "pm10_max_3h": 0.1037,
+      "pm10_mean_3h": 0.0341,
+      "hour_cos": 0.0118,
+      "pm10_lag_2h": 0.011,
+      "pm10_mean_24h": 0.0097,
+      "pm10_trend_3h": 0.0089,
+      "pm10_trend_6h": 0.0084,
+      "pm_ratio": 0.0078,
+      "humidity": 0.0073,
+      "pm10_anomaly": 0.0064,
+      "pm10_std_3h": 0.0056,
+      "pm10_lag_24h": 0.0055,
+      "pm25_lag_3h": 0.0054,
+      "temp_lag_24h": 0.0051
+    }
+  },
+  "regressor_metrics": {
+    "train_samples": 10392,
+    "train_mae": 13.81372856981801,
+    "train_rmse": 36.74524288331002,
+    "train_coverage": 0.8094688221709007,
+    "val_samples": 2599,
+    "val_mae": 27.365957844078167,
+    "val_rmse": 114.85423147894578,
+    "val_coverage": 0.7968449403616775
+  }
+}

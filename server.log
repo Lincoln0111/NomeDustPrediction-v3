@@ -1,0 +1,208 @@
+2025-12-28 23:06:44,535 - app - ERROR - Failed to load models: [Errno 2] No such file or directory: '/Users/ruthvikaroja/Documents/DustTool/dust_regressor.joblib'
+INFO:     Started server process [13761]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-12-28 23:06:49,763 - app - INFO - Integrated ML forecast system initialized
+ML models loaded from models
+  Classifier features: 81
+  Val AUC: 0.958
+Loaded 435 roads from nome.geojson
+Fetching weather data...
+  Got 120 hours of weather data
+Creating features...
+Generating predictions...
+Applying road-specific factors...
+INFO:     127.0.0.1:51237 - "GET /ml/current HTTP/1.1" 200 OK
+Fetching weather data...
+  Got 120 hours of weather data
+Creating features...
+Generating predictions...
+Applying road-specific factors...
+INFO:     127.0.0.1:51242 - "GET /ml/forecast?hours=24 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51253 - "GET /?id=2b8d143d-0d9d-4ba2-a1da-2269dcdc3c01&vscodeBrowserReqId=1766981262937 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51253 - "GET /map_script.js HTTP/1.1" 304 Not Modified
+Fetching weather data...
+  Got 120 hours of weather data
+Creating features...
+Generating predictions...
+Applying road-specific factors...
+INFO:     127.0.0.1:51253 - "GET /ml/current HTTP/1.1" 200 OK
+2025-12-28 23:07:43,099 - app - WARNING - No OPENWEATHERMAP_API_KEY found, using default values
+INFO:     127.0.0.1:51255 - "GET /weather/Nome HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51255 - "GET /aqi/Nome HTTP/1.1" 404 Not Found
+2025-12-28 23:07:43,102 - app - ERROR - Failed to initialize nowcast system: cannot import name 'DustNowcastSystem' from 'nome_dust_forecast_production' (/Users/ruthvikaroja/Documents/DustTool/nome_dust_forecast_production.py)
+2025-12-28 23:07:43,102 - app - ERROR - Nowcast failed: cannot import name 'DustNowcastSystem' from 'nome_dust_forecast_production' (/Users/ruthvikaroja/Documents/DustTool/nome_dust_forecast_production.py)
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/app.py", line 721, in nowcast_latest
+    system = _get_nowcast_system()
+  File "/Users/ruthvikaroja/Documents/DustTool/app.py", line 367, in _get_nowcast_system
+    from nome_dust_forecast_production import DustNowcastSystem
+ImportError: cannot import name 'DustNowcastSystem' from 'nome_dust_forecast_production' (/Users/ruthvikaroja/Documents/DustTool/nome_dust_forecast_production.py)
+INFO:     127.0.0.1:51255 - "GET /nowcast/latest HTTP/1.1" 500 Internal Server Error
+2025-12-28 23:07:43,113 - app - ERROR - Prediction failed: 503: Prediction models not loaded (missing .joblib files). Use /nowcast/latest or add the model files.
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/app.py", line 656, in predict
+    raise HTTPException(
+    ...<2 lines>...
+    )
+fastapi.exceptions.HTTPException: 503: Prediction models not loaded (missing .joblib files). Use /nowcast/latest or add the model files.
+INFO:     127.0.0.1:51255 - "POST /predict HTTP/1.1" 500 Internal Server Error
+2025-12-28 23:07:49,066 - app - ERROR - Unhandled exception: [TypeError("'numpy.bool' object is not iterable"), TypeError('vars() argument must have __dict__ attribute')]
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 336, in jsonable_encoder
+    data = dict(obj)
+TypeError: 'numpy.bool' object is not iterable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 341, in jsonable_encoder
+    data = vars(obj)
+TypeError: vars() argument must have __dict__ attribute
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 118, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 104, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 450, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 303, in serialize_response
+    return jsonable_encoder(response_content)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 301, in jsonable_encoder
+    encoded_value = jsonable_encoder(
+        value,
+    ...<4 lines>...
+        sqlalchemy_safe=sqlalchemy_safe,
+    )
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 301, in jsonable_encoder
+    encoded_value = jsonable_encoder(
+        value,
+    ...<4 lines>...
+        sqlalchemy_safe=sqlalchemy_safe,
+    )
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 344, in jsonable_encoder
+    raise ValueError(errors) from e
+ValueError: [TypeError("'numpy.bool' object is not iterable"), TypeError('vars() argument must have __dict__ attribute')]
+Fetching weather data...
+  Got 120 hours of weather data
+Creating features...
+Generating predictions...
+Applying road-specific factors...
+INFO:     127.0.0.1:51259 - "GET /ml/areas HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 336, in jsonable_encoder
+    data = dict(obj)
+TypeError: 'numpy.bool' object is not iterable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 341, in jsonable_encoder
+    data = vars(obj)
+TypeError: vars() argument must have __dict__ attribute
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/uvicorn/protocols/http/h11_impl.py", line 403, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/applications.py", line 1135, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 118, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 104, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 450, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+    )
+    ^
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 303, in serialize_response
+    return jsonable_encoder(response_content)
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 301, in jsonable_encoder
+    encoded_value = jsonable_encoder(
+        value,
+    ...<4 lines>...
+        sqlalchemy_safe=sqlalchemy_safe,
+    )
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 301, in jsonable_encoder
+    encoded_value = jsonable_encoder(
+        value,
+    ...<4 lines>...
+        sqlalchemy_safe=sqlalchemy_safe,
+    )
+  File "/Users/ruthvikaroja/Documents/DustTool/.venv/lib/python3.13/site-packages/fastapi/encoders.py", line 344, in jsonable_encoder
+    raise ValueError(errors) from e
+ValueError: [TypeError("'numpy.bool' object is not iterable"), TypeError('vars() argument must have __dict__ attribute')]
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13761]

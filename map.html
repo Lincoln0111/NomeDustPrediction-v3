@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nome Dust Risk Prediction</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; overflow: hidden; }
+        #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .panel { position: absolute; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; padding: 12px; }
+        .control-panel { top: 10px; left: 10px; max-width: 300px; }
+        h3 { margin: 0 0 12px 0; font-size: 1em; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 6px; }
+        h4 { margin: 8px 0 6px 0; font-size: 0.9em; color: #555; font-weight: 600; border-top: 1px solid #e0e0e0; padding-top: 8px; }
+        h4:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+        .input-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 4px; font-size: 0.85em; font-weight: 600; }
+        select, input[type="range"] { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85em; }
+        .range-value { display: inline-block; min-width: 30px; font-weight: 600; color: #007bff; }
+        .btn { width: 100%; padding: 8px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 8px; font-size: 0.9em; }
+        .btn:hover { background: #545b62; }
+        
+        /* Combined Info Panel */
+        .info-panel { top: 10px; right: 10px; width: 260px; }
+        .info-panel h4 { margin: 0 0 10px 0; font-size: 1em; color: #333; border-bottom: 2px solid #17a2b8; padding-bottom: 6px; }
+        .info-section { margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .info-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .info-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.85em; }
+        .info-row .label { color: #666; }
+        .info-row .value { font-weight: 600; color: #333; }
+        .risk-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8em; }
+        .risk-badge.green { background: #d4edda; color: #155724; }
+        .risk-badge.yellow { background: #fff3cd; color: #856404; }
+        .risk-badge.red { background: #f8d7da; color: #721c24; }
+        .pm-display { text-align: center; padding: 10px 0; }
+        .pm-value { font-size: 2.2em; font-weight: 700; }
+        .pm-label { font-size: 0.9em; color: #666; }
+        .status-indicator { font-size: 0.75em; padding: 3px 6px; border-radius: 3px; }
+        .status-indicator.frozen { background: #cce5ff; color: #004085; }
+        .status-indicator.simulation { background: #fff3cd; color: #856404; }
+        .status-indicator.normal { background: #d4edda; color: #155724; }
+        
+        /* Legend - Updated for PM10 scale */
+        .legend { bottom: 20px; right: 10px; min-width: 260px; font-size: 0.85em; }
+        .legend h4 { margin: 0 0 8px 0; font-size: 0.9em; color: #333; border-bottom: 2px solid #28a745; padding-bottom: 6px; border-top: none; padding-top: 0; margin-top: 0; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.82em; }
+        .legend-color { width: 30px; height: 15px; margin-right: 8px; border-radius: 3px; }
+        .legend-color.green { background: #00CC00; }
+        .legend-color.yellow { background: #FFB81C; }
+        .legend-color.red { background: #FF3333; }
+        .toggle-group { display: flex; gap: 8px; margin-bottom: 12px; }
+        .toggle-btn { flex: 1; padding: 8px; background: #e9ecef; color: #495057; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 0.85em; text-align: center; transition: all 0.2s; }
+        .toggle-btn:hover { background: #dee2e6; }
+        .toggle-btn.active { background: #28a745; color: white; border-color: #28a745; font-weight: 600; }
+        
+        /* Simulation checkbox */
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 8px; background: #fff3cd; border-radius: 4px; border: 1px solid #ffc107; }
+        .checkbox-group input { width: auto; }
+        .checkbox-group label { margin: 0; font-size: 0.8em; color: #856404; }
+        .simulation-warning { font-size: 0.7em; color: #856404; margin-top: 4px; }
+        
+        /* Small separator */
+        .section-divider { height: 1px; background: #ddd; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Control Panel (Left) - CONSOLIDATED CONTROLS -->
+    <div class="panel control-panel">
+        <h3>Dust Control Settings</h3>
+        
+        <!-- Environmental Factors -->
+        <h4>Road Conditions</h4>
+        <div class="input-group">
+            <label for="global-traffic">Traffic Level</label>
+            <select id="global-traffic" class="auto-update">
+                <option value="Low">Light Activity</option>
+                <option value="Medium" selected>Moderate Activity</option>
+                <option value="High">Heavy Activity</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="global-snow">Surface Condition</label>
+            <select id="global-snow" class="auto-update">
+                <option value="0" selected>Bare Ground</option>
+                <option value="1">Snow/Ice Cover</option>
+            </select>
+        </div>
+        
+        <!-- Maintenance History -->
+        <h4>Maintenance</h4>
+        <div class="input-group">
+            <label>Days Since Grading: <span class="range-value" id="grading-display">7</span></label>
+            <input type="range" class="auto-update" id="global-days-grading" value="7" min="0" max="60">
+        </div>
+        
+        <div class="input-group">
+            <label>Days Since Dust Suppressant: <span class="range-value" id="suppressant-display">30</span></label>
+            <input type="range" class="auto-update" id="global-days-suppressant" value="30" min="0" max="120">
+        </div>
+        
+        <!-- Simulation Mode -->
+        <div class="section-divider"></div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="ignore-frozen" />
+            <label for="ignore-frozen">Simulation Mode</label>
+        </div>
+        <div class="simulation-warning" id="simulation-warning" style="display: none;">
+            WARNING: Frozen ground physics disabled
+        </div>
+        
+        <button class="btn" id="refresh-weather">Refresh Data</button>
+    </div>
+    
+    <!-- Combined Info Panel (Right) -->
+    <div class="panel info-panel">
+        <h4>Nome, Alaska - Live Conditions</h4>
+        
+        <!-- Date/Time -->
+        <div class="info-section">
+            <div id="datetime-display" style="text-align: center; font-size: 0.85em;">
+                <strong id="local-date">Loading...</strong><br>
+                <span id="local-time"></span>
+            </div>
+        </div>
+        
+        <!-- PM10 Display (Main Focus) -->
+        <div class="info-section">
+            <div class="pm-display">
+                <div class="pm-value" id="pm10-value" style="color: #00AA00;">0</div>
+                <div class="pm-label">PM10 Dust Level</div>
+            </div>
+            <div style="text-align: center; margin-top: 5px;">
+                <span class="risk-badge green" id="risk-badge">Good</span>
+                <span class="status-indicator frozen" id="physics-status" style="margin-left: 8px;">Frozen</span>
+            </div>
+        </div>
+        
+        <!-- Weather Data -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="label">Temperature</span>
+                <span class="value" id="temp-value">--</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Wind Speed</span>
+                <span class="value" id="wind-value">--</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Humidity</span>
+                <span class="value" id="humidity-value">--</span>
+            </div>
+        </div>
+        
+        <!-- Air Quality Details -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="label">PM2.5</span>
+                <span class="value" id="pm25-value">-- µg/m³</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Dust Probability</span>
+                <span class="value" id="dust-prob-value">--%</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Data Source</span>
+                <span class="value" id="data-source">ML Forecast</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forecast Panel (Bottom) -->
+    <div class="panel" id="forecast-panel" style="bottom: 20px; left: 10px; width: 750px; max-width: calc(100vw - 20px); display: none; max-height: 400px; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: sticky; top: 0; background: white; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+            <h4 style="margin: 0; font-size: 0.95em; color: #333; border: none; padding: 0;">3-Day Dust Forecast</h4>
+            <button onclick="toggleForecast()" style="background: #dc3545; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em;">Close</button>
+        </div>
+        
+        <!-- Summary Stats -->
+        <div id="forecast-stats" style="margin-bottom: 12px; font-size: 0.8em; color: #666; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+            <div><strong>PM10 Range:</strong><br><span id="pm10-range">--</span></div>
+            <div><strong>Avg PM10:</strong><br><span id="avg-severity">--</span></div>
+            <div><strong>Risk Days:</strong><br><span id="risk-hours">--</span></div>
+            <div><strong>Status:</strong><br><span id="forecast-status">--</span></div>
+        </div>
+        
+        <!-- Chart -->
+        <div style="margin-bottom: 15px;">
+            <canvas id="forecast-chart" width="720" height="150"></canvas>
+        </div>
+        
+        <!-- Daily Forecast Table -->
+        <div style="font-size: 0.85em;">
+            <table id="forecast-table" style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #e9ecef; position: sticky; top: 50px;">
+                    <tr>
+                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Day</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">Temperature</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">PM10</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">AQI</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">Risk</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #dee2e6;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="forecast-table-body">
+                    <tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading 3-day forecast...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Legend Panel (Bottom Right) -->
+    <div class="panel legend">
+        <h4>Map Controls</h4>
+        <div class="toggle-group" style="margin-bottom: 12px;">
+            <div class="toggle-btn active" id="toggle-dust-map">Dust Roads</div>
+            <div class="toggle-btn" id="toggle-weather-map">Dust Heatmap</div>
+        </div>
+        
+        <div class="toggle-group">
+            <div class="toggle-btn" id="toggle-forecast" onclick="toggleForecast()">3-Day Forecast</div>
+        </div>
+    </div>
+    
+    <script src="map_script.js?v=3day"></script>
+</body>
+</html>
